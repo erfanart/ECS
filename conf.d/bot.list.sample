@@ -1,0 +1,20 @@
+{
+	"tg1":{
+		"bot_token":"<bot1 token>"
+		"chat_id":"<<attacker chat id>>",
+		"url":"https://api.telegram.org/bot{bot_token}/sendMessage"
+	}
+
+        "tg2":{
+                "bot_token":"<bot2 token>"
+                "chat_id":"<<attacker chat id>>",
+                "url":"https://api.telegram.org/bot{bot_token}/sendMessage"
+        }
+
+
+        "tg3":{
+                "bot_token":<bot3 token>"
+                "chat_id":"<attacker chat id>",
+                "url":"https://api.telegram.org/bot{bot_token}/sendMessage"
+        }
+}
