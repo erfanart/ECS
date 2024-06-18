@@ -1,7 +1,7 @@
 # ECS
 ![](./ECC.png)
 
-## $${\color{red} step1: }$$        
+## \color{red} step1:        
 
  <span style="color:blue"> victim exec the malware or rce on victim : </span>
 #### <span style="color:blue"> For windows:  </span>
