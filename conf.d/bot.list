@@ -1,7 +1,0 @@
-{
-	"tg":{
-		"bot_token":"<telgeram bot token>
-		"chat_id":"<attacke chat id>",
-		"url":"https://api.telegram.org/bot{bot_token}/sendMessage"
-	}
-}
