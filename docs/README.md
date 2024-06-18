@@ -1,1 +1,2 @@
 # ECC
+[./ECC.png]
