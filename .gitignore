@@ -1,6 +1,0 @@
-/clients/*
-!/clients/.gitkeep
-
-
-/conf.d/*
-!/conf.d/.gitkeep
