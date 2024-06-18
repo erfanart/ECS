@@ -1,2 +1,2 @@
 # ECC
-[./ECC.png]
+![./ECC.png]
