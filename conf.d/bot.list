@@ -1,0 +1,7 @@
+{
+	"tg":{
+		"bot_token":"7402417260:AAF7-mCgJDkS4gNHHbHGcLh6plYvmbLhy_Q",
+		"chat_id":"647340579",
+		"url":"https://api.telegram.org/bot{bot_token}/sendMessage"
+	}
+}
