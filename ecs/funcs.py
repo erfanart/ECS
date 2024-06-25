@@ -1,7 +1,9 @@
-import os,json,sys
+import json,sys
 import secrets
 import string
-from flask import  Flask,Blueprint,current_app
+
+
+from flask import  Flask
 
 # app = current_app
 app = Flask(__name__)

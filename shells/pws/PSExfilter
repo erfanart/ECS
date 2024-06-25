@@ -1,0 +1,51 @@
+
+Function Erfan-Split{
+	
+	param(
+	[Array] $Files, 
+	[STRING] $Destination, 
+	[int] $PieceSize = 10MB, 
+	[STRING] $Key, 
+	[int] $FirstPiece = 1, 
+	[int] $LastPiece = 10MB, 
+	[int] $Threads = 1
+	)
+    
+	
+	[ScriptBlock] $ScriptBlock = {
+        param([Byte[]]$BUFFER,[String]$path,[String]$Key,[int]$BYTESREAD)
+        try{
+            $Crypto = [System.Security.Cryptography.SymmetricAlgorithm]::Create('AES')
+            $Crypto.KeySize = 256
+            $Crypto.Key = New-object System.Security.Cryptography.SHA256Managed | ForEach-Object {$_.ComputeHash([System.Text.Encoding]::UTF8.GetBytes($Key))};
+            $FileStreamWriter = New-Object System.IO.FileStream($path, [System.IO.FileMode]::Create);
+            $Crypto.GenerateIV()
+            $FileStreamWriter.Write([System.BitConverter]::GetBytes($Crypto.IV.Length), 0, 4)
+            $FileStreamWriter.Write($Crypto.IV, 0, $Crypto.IV.Length)
+            $Transform = $Crypto.CreateEncryptor();
+            $CryptoStream = New-Object System.Security.Cryptography.CryptoStream($FileStreamWriter, $Transform, [System.Security.Cryptography.CryptoStreamMode]::Write);    
+            $CryptoStream.Write($BUFFER, 0, $BYTESREAD);
+            $CryptoStream.FlushFinalBlock();
+        }catch{}
+        Finally{
+            if($FileStreamWriter){$FileStreamWriter.Close()};
+            if($CryptoStream){$CryptoStream.Close()};
+        }
+    }
+	
+	
+	
+	function Compress-Folder($Source,$Destination){
+		Add-Type -AssemblyName System.IO.Compression.FileSystem
+		$Destination = $Destination +"\" + $(Split-Path -Path $Source -Leaf) + "$step.zip"
+		[System.IO.Compression.ZipFile]::CreateFromDirectory($Source, $Destination)
+		return $Destination
+		
+	}
+	
+	
+	
+	function Process-File($File, $Destination, $PieceSize, $Key, $FirstPiece, $LastPiece, $Threads, $ScriptBlock) {
+		try{
+			$ErrorActionPreference = "Stop"
+			"Source: $File";

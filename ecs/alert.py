@@ -1,4 +1,6 @@
-from ecs.bot import send_alert
+from ecs.bot import *
+from flask import  Flask
+app = Flask(__name__)
 
 def alert(detail):
     name , lastname , port , ip , header = detail.values()
@@ -16,5 +18,5 @@ request headers:
 #######################
 """
     
-    
+    app.logger.info('sending alert ...')
     send_alert(message)

